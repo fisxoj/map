@@ -1,0 +1,9 @@
+* Matrix loop macros
+  Try to integrate them with loop, something like
+  (loop for i, j, k over matrix M ,body) << This seems more useful to me
+
+  or
+
+  (loop for i over matrix-axis 1 of M ...)
+** Cell manipulation
+   Maybe some get/set cell macros in there?
