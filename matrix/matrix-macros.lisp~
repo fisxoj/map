@@ -1,0 +1,17 @@
+(in-package :map)
+
+(defmacro loop-over-matrix (M indices &body body)
+  (loop
+     for var in indices
+     for i from 0 by 1
+       
+  ))
+
+(defmacro compose-matrix-loop (M indices index &body body)
+  (if (not (cdr indices))
+      `(loop for ,@(car indices) from 0 to ,(array-dimension M index)
+	    do ,(compose-matrix-loop M (cdr indices) (1- index body)))
+      body))
+
+(defmacro loop-over-vector (V index)
+  )

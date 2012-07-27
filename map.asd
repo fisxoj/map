@@ -1,27 +1,22 @@
-(defpackage :map
-  (:use :cl)
-  (:export
-   ;; Matrix math operation
-   #:.+
-   ;; Matrix predicates
-   #:same-size-p
-   ;; Matrix operations
-   #:tensor-product))
-
-(in-package :map)
-
-(defsystem map
+(defsystem :map
+  :serial t
   :description "Octave-like functionality for lisp!"
   :version "0.0.1"
   :author "Matt Novenstern <fisxoj@gmail.com>"
-  :components ((:file "matrices")
-	       (:file "vector")
-	       (:file "matrix-predicates"
-		      :depends-on ("matrices"))
-	       (:file "matrix-math"
-		      :depends-on ("matrices"))
-	       (:file "matrix-operations"
-		      :depends-on ("matrices"))
-	       (:file "matrix-macros"
-		      :depends-on ("matrices"))))
-
+  :components ((:file "package")
+	       (:file "conditions")
+	       (:module vectors
+			:components ((:file "vector")))
+	       (:module matrix
+			:components ((:file "matrices")
+				     (:file "matrix-predicates")
+				     (:file "matrix-operations")
+;				     (:file "matrix-macros")
+				     ))
+	       (:module calculus
+			:components ((:file "integration")))
+	       (:module plotting
+			:components ((:file "plot")))
+	       (:module images
+			:components ((:file "image"))))
+  :depends-on (#:gsll #:cl-jpeg #:external-program))
