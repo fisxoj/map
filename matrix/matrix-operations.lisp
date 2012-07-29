@@ -75,3 +75,6 @@
 
 (defmethod .* ((B array) (A number))
   (.* B A))
+
+(defmethod .- (A B)
+  (.+ A (.* -1 B)))

@@ -17,8 +17,12 @@
    #:czeros
    #:mtrace
 
+   ;; Vector operations
+   #:norm
+
    ;; Calculus
    #:riemann
+   #:rkf45
 
    ;; Images
    #:imread

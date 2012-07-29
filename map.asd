@@ -6,7 +6,8 @@
   :components ((:file "package")
 	       (:file "conditions")
 	       (:module vectors
-			:components ((:file "vector")))
+			:components ((:file "vector")
+				     (:file "vector-operations")))
 	       (:module matrix
 			:components ((:file "matrices")
 				     (:file "matrix-predicates")
@@ -14,7 +15,8 @@
 ;				     (:file "matrix-macros")
 				     ))
 	       (:module calculus
-			:components ((:file "integration")))
+			:components ((:file "integration")
+				     (:file "rkf45")))
 	       (:module plotting
 			:components ((:file "plot")))
 	       (:module images
