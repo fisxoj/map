@@ -44,6 +44,6 @@ tolerance: tolerance"
 		       do (vector-push-extend (elt rk5 j) (nth j ys)))
 		    (vector-push-extend err errs)
 		    (return))
-		  (setf step (* step (expt (/ tolerance err) 1/4)))
+		  (setf step (* step (expt (/ tolerance err 2d0) 1/4)))
 		  )))
     (values ts ys)))
