@@ -12,6 +12,7 @@
 			:components ((:file "matrices")
 				     (:file "matrix-predicates")
 				     (:file "matrix-operations")
+				     (:file "slices")
 ;				     (:file "matrix-macros")
 				     ))
 	       (:module calculus
