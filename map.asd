@@ -1,7 +1,7 @@
 (defsystem :map
   :serial t
   :description "Octave-like functionality for lisp!"
-  :version "0.0.1"
+  :version "0.0.2"
   :author "Matt Novenstern <fisxoj@gmail.com>"
   :components ((:file "package")
 	       (:file "conditions")
@@ -9,6 +9,7 @@
 			:components ((:file "printing")))
 	       (:module vectors
 			:components ((:file "vector")
+				     (:file "range")
 				     (:file "vector-operations")))
 	       (:module matrix
 			:components ((:file "matrices")
