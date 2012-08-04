@@ -32,7 +32,10 @@
 	 do (setf (aref new j i) (aref M i j))
 	 return M)))
 
-(defmethod .+ ((A simple-array) (B simple-array))
+(defgeneric .+ (A B)
+  (:documentation "Matrix addition function, will also add single numbers elementwise to the matrix."))
+
+(defmethod .+ ((A array) (B array))
   (if (same-size-p A B)
       (let ((result (apply 'zeros (array-dimensions A))))
 	(loop for i from 0 upto (1- (array-total-size A))
@@ -42,7 +45,7 @@
 	   finally (return result)))
       (error 'dimension-mismatch :a A :b B)))
 
-(defmethod .+ ((A simple-array) (B number))
+(defmethod .+ ((A array) (B number))
   (let ((result (apply 'zeros (array-dimensions A))))
     (loop for i from 0 upto (1- (array-total-size A))
        do (setf (row-major-aref result i)
@@ -50,8 +53,11 @@
 		   B))
        finally (return result))))
 
-(defmethod .+ ((A number) (B simple-array))
+(defmethod .+ ((A number) (B array))
   (.+ B A))
+
+(defmethod .+ (A B)
+  (error ".+ Not implelented for types ~a and ~a" (type-of A) (type-of B)))
 
 
 (defmethod .* ((A simple-array) (B simple-array))
