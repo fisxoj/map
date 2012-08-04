@@ -31,6 +31,9 @@
    #:plot
    #:plot3d
    #:image
+
+   ;; Printing utility functions
+   #:mute
    ))
 
 (in-package :map)

@@ -5,6 +5,8 @@
   :author "Matt Novenstern <fisxoj@gmail.com>"
   :components ((:file "package")
 	       (:file "conditions")
+	       (:module utilities
+			:components ((:file "printing")))
 	       (:module vectors
 			:components ((:file "vector")
 				     (:file "vector-operations")))
