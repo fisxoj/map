@@ -8,7 +8,7 @@
   `(let ((gnuplot (ensure-gnuplot-connection)))
      (unwind-protect
 	  (with-open-stream (,stream (external-program:process-input-stream gnuplot))
-	    (format ,stream "set term x11~%")
+	    (format ,stream "set term wx~%")
 	    ,@body)
 ;       (external-program:process-close gnuplot)
 )))
