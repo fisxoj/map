@@ -1,10 +1,5 @@
 (in-package #:map)
 
-(defclass range ()
-  ((start :accessor range-start :initarg :start)
-   (delta :accessor range-delta :initarg :delta)
-   (stop  :accessor range-stop  :initarg :stop)))
-
 (defun vectorize-macro (stream subchar arg)
   (declare (ignore subchar arg))
   (let* ((sexp (read stream t))
@@ -32,16 +27,6 @@
     (if function
 	(map 'vector function vector)
 	vector)))
-
-(defun range-macro (stream subchar arg)
-  (declare (ignore subchar arg))
-  (let* ((sexp (read stream t))
-	 (xi (first sexp))
-	 (xf (or (third sexp) (second sexp)))
-	 (dx (second sexp)))
-    (if (caddr sexp)
-	`(make-instance 'range :start ,xi :delta ,dx :stop ,xf)
-	`(make-instance 'range :start ,xi :delta ,(signum (- xf xi)) :stop ,xf))))
 
 
 (defun vec-dbg (xi dx xf)
@@ -98,5 +83,3 @@
        finally (return vector))))
 
 (set-dispatch-macro-character #\# #\v #'vectorize-macro)
-
-(set-dispatch-macro-character #\# #\r #'range-macro)
