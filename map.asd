@@ -25,4 +25,4 @@
 			:components ((:file "plot")))
 	       (:module images
 			:components ((:file "image"))))
-  :depends-on (#:gsll #:cl-jpeg #:external-program))
+  :depends-on (#:cl-jpeg #:external-program))
