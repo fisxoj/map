@@ -46,7 +46,7 @@
 (defun print-vectors-to-stream (stream x y)
 	  (loop for xi across x
 	       for yi across y
-	     do (format stream "~g ~g~%" xi yi))
+	     do (format stream "~1,8f ~1,8f~%" xi yi))
 	  (format stream "e~%"))
 
 (defun plot (&rest args)
