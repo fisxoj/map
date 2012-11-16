@@ -79,7 +79,7 @@
        do (setf (row-major-aref result i) (* A (row-major-aref B i))))
     result))
 
-(defmethod .* ((B array) (A number))
+(defmethod .* ((A array) (B number))
   (.* B A))
 
 (defmethod .- (A B)
