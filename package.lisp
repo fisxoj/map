@@ -14,6 +14,7 @@
    #:tensor-product
    #:eye
    #:zeros
+   #:ones
    #:czeros
    #:mtrace
 
