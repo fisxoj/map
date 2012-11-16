@@ -13,13 +13,10 @@
 
 (defun range-macro (stream subchar arg)
   (declare (ignore subchar arg))
-  (let* ((sexp (read stream t))
-	 (xi (first sexp))
-	 (xf (or (third sexp) (second sexp)))
-	 (dx (second sexp)))
-    (if (caddr sexp)
-	`(make-instance 'range :start ,xi :delta ,dx :stop ,xf)
-	`(make-instance 'range :start ,xi :delta ,(signum (- xf xi)) :stop ,xf))))
+  (let* ((sexp (read stream t)))
+    (ecase (length sexp)
+      (3 `(make-instance 'range :start ,(first sexp) :delta ,(second sexp) :stop ,(third sexp)))
+      (2 `(make-instance 'range :start ,(first sexp) :delta ,(max (signum (- (second sexp) (first sexp))) 1) :stop ,(second sexp))))))
 
 (set-dispatch-macro-character #\# #\r #'range-macro)
 
