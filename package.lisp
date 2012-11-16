@@ -17,6 +17,9 @@
    #:czeros
    #:mtrace
 
+   ;; Matrix macros
+   #:domatrix
+
    ;; Vector operations
    #:norm
 
