@@ -10,3 +10,9 @@
 	;; do (setf ,indices (indices-from-row-major ,matrix ,i))
 	  
 	do (progn ,@body))))
+
+(defmacro as-vector (matrix)
+  `(make-array (array-total-size ,matrix)
+	       :element-type (array-element-type ,matrix)
+	       :displaced-to ,matrix
+	       :displaced-index-offset 0))

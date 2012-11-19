@@ -25,6 +25,7 @@
 
    ;; Matrix macros
    #:domatrix
+   #:as-vector
 
    ;; Vector operations
    #:norm
