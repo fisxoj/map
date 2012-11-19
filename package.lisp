@@ -1,6 +1,11 @@
 (defpackage #:map
   (:use #:cl)
   (:export
+   ;; Matrix type definitions
+   #:complex-matrix
+   #:real-matrix
+   #:matrix
+
    ;; Matrix math operation
    #:.+
    #:.*

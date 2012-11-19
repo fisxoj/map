@@ -1,7 +1,8 @@
 (in-package #:map)
 
-(deftype real-matrix () '(simple-array double-float *))
-(deftype complex-matrix () '(simple-array (complex double-float) *))
+(deftype real-matrix () '(array double-float *))
+(deftype complex-matrix () '(array (complex double-float) *))
+(deftype matrix () '(or real-matrix complex-matrix))
 
 (deftype matrix () '(or real-matrix complex-matrix))
 
