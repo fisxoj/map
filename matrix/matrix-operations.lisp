@@ -2,8 +2,14 @@
 
 (declaim (optimize (speed 3)))
 
-(export '(tensor-product
-	  mtrace))
+(defun mapply (func data)
+  (loop
+     with result = (cl-utilities:copy-array data)  
+     for i from 0 below (array-total-size result)
+     do (setf (row-major-aref result i)
+	      (funcall func (row-major-aref result i)))
+     finally (return result)
+       ))
 
 (defun tensor-product (A B)
   (declare (type matrix A B))

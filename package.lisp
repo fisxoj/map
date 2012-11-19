@@ -22,6 +22,7 @@
    #:ones
    #:czeros
    #:mtrace
+   #:mapply
 
    ;; Matrix macros
    #:domatrix
