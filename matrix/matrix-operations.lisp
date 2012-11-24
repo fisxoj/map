@@ -90,3 +90,8 @@
 
 (defmethod .- (A B)
   (.+ A (.* -1 B)))
+
+(defun norm (matrix)
+  (.* (1/ (loop for element across (as-vector matrix)
+	     maximize element))
+      matrix))

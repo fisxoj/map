@@ -17,6 +17,7 @@
 
    ;; Matrix operations
    #:tensor-product
+   #:norm
    #:eye
    #:zeros
    #:ones
