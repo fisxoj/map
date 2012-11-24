@@ -24,6 +24,7 @@
    #:czeros
    #:mtrace
    #:mapply
+   #:determinant
 
    ;; Matrix macros
    #:domatrix

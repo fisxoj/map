@@ -95,3 +95,19 @@
   (.* (1/ (loop for element across (as-vector matrix)
 	     maximize element))
       matrix))
+
+;; FIXME: Make this a method?
+(defun determinant (matrix)
+;  (declare (type matrix matrix))
+  (if (squarep matrix)
+      (let ((length (array-dimension matrix 0)))
+	(loop for i from 0 upto (- length 2)
+	   sum (loop
+		  with positive-terms = 1.0d0
+		  with negative-terms = 1.0d0
+		  for j from 0 upto (1- length)
+		  do (multf positive-terms (aref matrix (mod (+ i j) length) j))
+		  do (multf negative-terms (aref matrix (mod (+ i (* -1 j) -1) length) j))
+;		  do (format t "~a ~a~%" (aref matrix (mod (+ i j) length) j) (aref matrix (mod (+ i (* -1 j) -1) length) j))
+		  finally (return (- positive-terms negative-terms)))))
+      (error 'matrix-not-square)))
