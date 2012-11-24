@@ -21,3 +21,6 @@
   (and (loop for i from 0 to (1- (array-dimension M 0))
 	  collect (loop for j from 0 to (- (array-dimension M 1) i 1)
 		     collect (= (conjugate (aref M i j)) (aref M j i))))))
+
+(defun singularp (M)
+  (zerop (determinant M)))

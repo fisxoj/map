@@ -18,6 +18,7 @@
    #:same-size-p
    #:hermitianp
    #:squarep
+   #:singularp
 
    ;; Matrix operations
    #:tensor-product
