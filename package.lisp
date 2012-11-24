@@ -30,6 +30,7 @@
    #:mtrace
    #:mapply
    #:determinant
+   #:inverse
 
    ;; Matrix macros
    #:domatrix

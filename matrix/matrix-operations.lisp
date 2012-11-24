@@ -111,3 +111,8 @@
 ;		  do (format t "~a ~a~%" (aref matrix (mod (+ i j) length) j) (aref matrix (mod (+ i (* -1 j) -1) length) j))
 		  finally (return (- positive-terms negative-terms)))))
       (error 'matrix-not-square)))
+
+(defun inverse (matrix)
+;  (declare (type matrix matrix))
+  (.* (1/ (determinant matrix))
+      (transpose matrix)))
