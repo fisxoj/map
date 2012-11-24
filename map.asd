@@ -6,7 +6,8 @@
   :components ((:file "package")
 	       (:file "conditions")
 	       (:module utilities
-			:components ((:file "printing")))
+			:components ((:file "printing")
+				     (:file "missing-functions")))
 	       (:module vectors
 			:components ((:file "vector")
 				     (:file "range")

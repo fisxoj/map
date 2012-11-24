@@ -1,6 +1,10 @@
 (defpackage #:map
   (:use #:cl)
   (:export
+   ;; Missing functions
+   #:multf
+   #:1/
+
    ;; Matrix type definitions
    #:complex-matrix
    #:real-matrix
