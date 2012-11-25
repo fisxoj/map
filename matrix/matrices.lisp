@@ -29,3 +29,6 @@
 	(floor row-major-index (car matrix-dimensions))
       (cons remainder (%row-major-subscript (cdr matrix-dimensions) multiple)))))
 
+(defun subscripts-row-major (matrix &rest subscripts)
+  (+ (car subscripts)
+     (reduce #'+ (mapcar #'* (cdr (array-dimensions matrix)) (cdr subscripts)))))

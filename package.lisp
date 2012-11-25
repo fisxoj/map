@@ -32,6 +32,7 @@
    #:determinant
    #:inverse
    #:row-major-subscripts
+   #:subscripts-row-major
 
    ;; Matrix macros
    #:do-matrix
