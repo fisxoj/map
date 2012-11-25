@@ -39,6 +39,7 @@
 
    ;; Vector operations
    #:norm
+   #:dot
 
    ;; Calculus
    #:riemann
