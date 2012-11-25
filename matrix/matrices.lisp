@@ -4,8 +4,6 @@
 (deftype complex-matrix () '(array (complex double-float) *))
 (deftype matrix () '(or real-matrix complex-matrix))
 
-(deftype matrix () '(or real-matrix complex-matrix))
-
 (defun zeros (&rest dimensions)
   (make-array dimensions :element-type 'double-float :initial-element 0.0d0))
 
