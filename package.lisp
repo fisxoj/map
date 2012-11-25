@@ -31,6 +31,7 @@
    #:mapply
    #:determinant
    #:inverse
+   #:row-major-subscripts
 
    ;; Matrix macros
    #:domatrix
