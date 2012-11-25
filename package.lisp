@@ -34,7 +34,7 @@
    #:row-major-subscripts
 
    ;; Matrix macros
-   #:domatrix
+   #:do-matrix
    #:as-vector
 
    ;; Vector operations
