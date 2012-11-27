@@ -29,6 +29,7 @@
    #:czeros
    #:mtrace
    #:mapply
+   #:mref
    #:determinant
    #:inverse
    #:row-major-subscripts

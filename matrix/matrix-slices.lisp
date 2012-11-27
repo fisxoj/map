@@ -18,11 +18,12 @@
     ;; pass things along to regular old aref.
 
     (if submatrix-dimensions
-	(loop
-	   for i from 0 upto (1- (array-total-size submatrix))
-	   do (setf (row-major-aref submatrix i)
-		    (apply #'aref matrix (mapcar #'+ start-points (row-major-subscripts submatrix i))))
-	     finally (return submatrix))
+	(reshape-matrix
+	 (loop
+	    for i from 0 upto (1- (array-total-size submatrix))
+	    do (setf (row-major-aref submatrix i)
+		     (apply #'aref matrix (mapcar #'+ start-points (row-major-subscripts submatrix i))))
+	    finally (return submatrix)))
 	(apply #'aref matrix subscripts))))
 
 ;; FIXME: Implement.
@@ -50,3 +51,13 @@
 	 ((eq sub t)
 	  (list 0 (car matrix-dimensions))))
        (%submatrix-dimensions (cdr matrix-dimensions) rest)))))
+
+(defun reduced-dimensions (matrix)
+  (remove-if (lambda (a) (= a 1)) (array-dimensions matrix)))
+
+(defun reshape-matrix (matrix)
+  "Utility for the mref functions which takes a submatrix, which sometimes contains arrays with dimensions that are 1.  i.e. a 2x4x1 matrix, which will be far more useful as a 2x4 matrix.  This function makes a displaced array to the original, but with the more useful shape."
+  (make-array (reduced-dimensions matrix)
+	      :element-type (array-element-type matrix)
+	      :displaced-to matrix
+	      :displaced-index-offset 0))
