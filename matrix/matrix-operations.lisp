@@ -31,12 +31,11 @@
     (loop for i from 0 to (1- (array-dimension M 0))
 	 sum (aref M i i))))
 
-(defun transpose (M)
-  (let ((new (make-array (array-dimensions M))))
-    (loop for i from 0 upto (1- (array-dimension M 0))
-	 for j from 0 upto (1- (array-dimension M 1))
-	 do (setf (aref new j i) (aref M i j))
-	 return M)))
+(defun transpose (matrix)
+  (let ((result (make-array (nreverse (array-dimensions matrix)))))
+    (do-matrix (result (i j))
+      (setf (aref result i j) (aref matrix j i)))
+    result))
 
 (defgeneric .+ (A B)
   (:documentation "Matrix addition function, will also add single numbers elementwise to the matrix."))
