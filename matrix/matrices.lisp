@@ -30,5 +30,12 @@
       (cons remainder (%row-major-subscript (cdr matrix-dimensions) multiple)))))
 
 (defun subscripts-row-major (matrix &rest subscripts)
-  (+ (car subscripts)
-     (reduce #'+ (mapcar #'* (cdr (array-dimensions matrix)) (cdr subscripts)))))
+  (let ((array-dimensions (array-dimensions matrix))
+	(subscripts subscripts))
+    (%subscripts-row-major (cdr array-dimensions) subscripts)))
+
+(defun %subscripts-row-major (dimensions subscripts)
+  (+ (* (car subscripts) (reduce #'* dimensions))
+     (if (cdr dimensions)
+	 (%subscripts-row-major (cdr dimensions) (cdr subscripts))
+	 (second subscripts))))
