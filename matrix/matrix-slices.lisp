@@ -9,7 +9,7 @@
 (defun mref (matrix &rest subscripts)
   "Functions like (aref), but accepts ranges or T and returns a submatrix of matrix."
   (let* ((submatrix-instructions
-	  (%submatrix-dimensions (array-dimensions matrix) subscripts))
+	  (%submatrix-instructions (array-dimensions matrix) subscripts))
 	 (submatrix-dimensions
 	  (mapcar #'second submatrix-instructions))
 	 (submatrix (apply #'zeros submatrix-dimensions))
@@ -27,10 +27,24 @@
 	(apply #'aref matrix subscripts))))
 
 ;; FIXME: Implement.
-(defun (setf mref) (matrix &rest subscripts)
-  )
+(defun (setf mref) (source-matrix target-matrix &rest subscripts)
+  (let* ((submatrix-instructions
+	  (%submatrix-instructions (array-dimensions target-matrix) subscripts))
+	 (start-points (mapcar #'first submatrix-instructions))
+	 (reduced-dimensions
+	  (remove-if (lambda (a) (= a 1)) (mapcar #'second submatrix-instructions))))
+    (assert (reduce (lambda (a b) (and a b))
+		    (mapcar #'= reduced-dimensions (array-dimensions source-matrix))))
+    (print start-points)
+    (loop
+       for i from 0 upto (1- (array-total-size source-matrix))
+       do (print (mapcar #'+ start-points (row-major-subscripts target-matrix i)))
+       do (setf (apply #'aref target-matrix
+		       (mapcar #'+ start-points (%row-major-subscript (mapcar #'second submatrix-instructions) i)))
+		(row-major-aref source-matrix i))
+       finally (return target-matrix))))
 
-(defun %submatrix-dimensions (matrix-dimensions subscripts)
+(defun %submatrix-instructions (matrix-dimensions subscripts)
   (assert (= (length matrix-dimensions) (length subscripts)))
   (when subscripts
     (destructuring-bind (sub . rest) subscripts
