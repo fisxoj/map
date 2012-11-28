@@ -14,10 +14,10 @@
 				     (:file "vector-operations")))
 	       (:module matrix
 			:components ((:file "matrices")
+				     (:file "matrix-macros")
 				     (:file "matrix-predicates")
 				     (:file "matrix-operations")
 				     (:file "matrix-slices")
-				     (:file "matrix-macros")
 				     ))
 	       (:module calculus
 			:components ((:file "integration")
