@@ -31,6 +31,7 @@
    #:mapply
    #:mref
    #:determinant
+   #:transpose
    #:inverse
    #:row-major-subscripts
    #:subscripts-row-major
