@@ -112,7 +112,7 @@
 (defmethod .- (A B)
   (.+ A (.* -1 B)))
 
-(defun norm (matrix)
+(defmethod norm ((matrix array))
   (.* (1/ (loop for element across (as-vector matrix)
 	     maximize element))
       matrix))
