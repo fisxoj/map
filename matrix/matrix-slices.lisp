@@ -86,7 +86,7 @@
 	  (list sub 1))
 	 ((eq sub t)
 	  (list 0 (car matrix-dimensions))))
-       (%submatrix-dimensions (cdr matrix-dimensions) rest)))))
+       (%submatrix-instructions (cdr matrix-dimensions) rest)))))
 
 (defun reduced-dimensions (matrix)
   (remove-if (lambda (a) (= a 1)) (array-dimensions matrix)))
