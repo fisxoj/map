@@ -71,3 +71,8 @@
 	(setf (row-major-aref result row-major) (apply #'aref matrix indices))
 	(incf row-major)))
     result))
+
+(defun random-matrix (&rest dimensions)
+  (with-result (result dimensions)
+    (do-matrix (result subscripts)
+      (setf (apply #'aref result subscripts) (random 1.0d0)))))

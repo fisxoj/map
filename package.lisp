@@ -51,6 +51,7 @@
    #:zeros
    #:ones
    #:czeros
+   #:random-matrix
    #:mtrace
    #:mapply
    #:mref
