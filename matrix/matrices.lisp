@@ -42,7 +42,7 @@
      finally (return m)))
 
 (defun row-major-subscripts (matrix row-major-index)
-  (nreverse (%row-major-subscript (array-dimensions matrix) row-major-index)))
+  (%row-major-subscript (array-dimensions matrix) row-major-index))
 
 (defun %row-major-subscript (matrix-dimensions row-major-index)
 ;  (format t "~a ~a~%" matrix-dimensions row-major-index)  
