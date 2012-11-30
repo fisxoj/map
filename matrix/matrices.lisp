@@ -61,3 +61,13 @@
      (if (cdr dimensions)
 	 (%subscripts-row-major (cdr dimensions) (cdr subscripts))
 	 (second subscripts))))
+
+(defun minor-matrix (matrix &rest subscripts)
+  (let ((result (apply #'zeros (mapcar #'1- (array-dimensions matrix))))
+	(row-major 0))
+    (do-matrix (matrix indices)
+      ;; Don't copy a number if any of the indices matches a sprcified subscript
+      (unless (reduce (lambda (a b) (or a b)) (mapcar #'= indices subscripts))
+	(setf (row-major-aref result row-major) (apply #'aref matrix indices))
+	(incf row-major)))
+    result))
