@@ -88,25 +88,38 @@
 
 
 (defmethod .* ((A simple-array) (B simple-array))
-  (if (inner-dimensions-match-p A B)
-      (let* ((dimA (array-dimensions A))
-	     (dimB (array-dimensions B))
-	     (dimresult (list (first dimA) (second dimB)))
-	     (result (make-array dimresult)))
-	(loop for i from 0 upto (1- (first dimresult))
-	   do (loop for j from 0 upto (1- (second dimresult))
-		   do (loop for k from 0 upto (1- (second dimA))
-			   do (incf (aref result i j)
-				    (* (aref A i k) (aref B k j)))))))))
+  (with-result (result (list (array-dimension A 0) (array-dimension B 1)))
+    (do-matrix (result (i j))
+      (setf (aref result i j) (dot (mref a i t) (mref b t j))))))
+
+(defmethod .* ((A vector) (B vector))
+  (dot A B))
+
+(defmethod .* ((A simple-array) (B vector))
+    (with-result (result (array-dimensions B))
+      (loop for i from 0 upto (1- (length B))
+	 do (setf (aref result i) (.* B (mref A i t))))))
+
+(defmethod .* ((A vector) (B simple-array))
+  (with-result (result (list (length A)))
+    (loop for i from 0 below (1- (length A))
+       do (setf (aref result i) (.* A (mref B i t))))))
 
 (defmethod .* ((A number) (B array))
-  (let* ((dimA (array-dimensions B))
-	 (result (make-array dimA)))
+  (with-result (result (array-dimensions B))
     (loop for i from 0 upto (1- (array-total-size B))
        do (setf (row-major-aref result i) (* A (row-major-aref B i))))
     result))
 
 (defmethod .* ((A array) (B number))
+  (.* B A))
+
+(defmethod .* ((A number) (B vector))
+  (with-result (result (list (length B)))
+    (do-matrix (B (i))
+      (setf (aref result i) (* A (aref B i))))))
+
+(defmethod .* ((A vector) (B number))
   (.* B A))
 
 (defmethod .- (A B)
