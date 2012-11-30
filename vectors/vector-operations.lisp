@@ -29,3 +29,9 @@
   "Dot product of two vectors.  Returns a scalar."
   (assert (= (length a) (length b)))
   (reduce #'+ (map 'vector '* a b)))
+
+(defun mean (vector)
+  (/ (sum vector) (length vector)))
+
+(defmethod sum ((vector vector))
+  (loop for i across vector sum i))
