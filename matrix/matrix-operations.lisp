@@ -150,3 +150,11 @@
 ;  (declare (type matrix matrix))
   (.* (1/ (determinant matrix))
       (transpose matrix)))
+
+(defun adjugate (matrix)
+  (with-result (result (array-dimensions matrix))
+    (do-matrix (result subscripts)
+      (setf (apply #'aref result subscripts)
+	    ;; -1^(i+j+k+...) power * determinant of the minor matrix
+	    (* (expt -1 (reduce #'+ (mapcar #'1+ subscripts)))
+	       (determinant (apply #'minor-matrix matrix subscripts)))))))
