@@ -54,10 +54,8 @@
 	  (remove-if (lambda (a) (= a 1)) (mapcar #'second submatrix-instructions))))
     (assert (reduce (lambda (a b) (and a b))
 		    (mapcar #'= reduced-dimensions (array-dimensions source-matrix))))
-    (print start-points)
     (loop
        for i from 0 upto (1- (array-total-size source-matrix))
-       do (print (mapcar #'+ start-points (row-major-subscripts target-matrix i)))
        do (setf (apply #'aref target-matrix
 		       (mapcar #'+ start-points (%row-major-subscript (mapcar #'second submatrix-instructions) i)))
 		(row-major-aref source-matrix i))
