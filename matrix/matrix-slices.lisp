@@ -34,18 +34,15 @@
 	  (%submatrix-instructions (array-dimensions matrix) subscripts))
 	 (submatrix-dimensions
 	  (mapcar #'second submatrix-instructions))
-	 (submatrix (apply #'zeros submatrix-dimensions))
 	 (start-points (mapcar #'first submatrix-instructions)))
     ;; If submatrix-dimensions is nil, the array has one element and we should just
     ;; pass things along to regular old aref.
-
-    (if submatrix-dimensions
+    (if (not (every (lambda (a) (= 1 a)) submatrix-dimensions))
 	(reshape-matrix
-	 (loop
-	    for i from 0 upto (1- (array-total-size submatrix))
-	    do (setf (row-major-aref submatrix i)
-		     (apply #'aref matrix (mapcar #'+ start-points (row-major-subscripts submatrix i))))
-	    finally (return submatrix)))
+	 (with-result (submatrix submatrix-dimensions)
+	   (do-matrix (submatrix indices)
+	     (setf (apply #'aref submatrix indices)
+		   (apply #'aref matrix (mapcar #'+ start-points indices))))))
 	(apply #'aref matrix subscripts))))
 
 ;; FIXME: Implement.
