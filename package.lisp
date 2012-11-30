@@ -34,7 +34,9 @@
 
    ;; Matrix math operation
    #:.+
+   #:.-
    #:.*
+   #:.^
 
    ;; Matrix predicates
    #:same-size-p

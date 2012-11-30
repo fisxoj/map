@@ -130,6 +130,14 @@
 	     maximize element))
       matrix))
 
+(defmethod .^ ((A array) (p integer))
+  (assert (squarep A))
+  (cond
+    ((zerop p) (eye (array-dimension A 0)))
+    ((= 1 p) A)
+    ((> p 1) (.* A (.^ A (1- p))))
+    (t (error ".^ Not implemented for non-positive-integer powers"))))
+
 ;; FIXME: Make this a method?
 (defun determinant (matrix)
 ;  (declare (type matrix matrix))
