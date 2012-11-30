@@ -149,7 +149,7 @@
 (defun inverse (matrix)
 ;  (declare (type matrix matrix))
   (.* (1/ (determinant matrix))
-      (transpose matrix)))
+      (adjugate matrix)))
 
 (defun adjugate (matrix)
   (with-result (result (array-dimensions matrix))
