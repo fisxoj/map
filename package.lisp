@@ -80,6 +80,9 @@
 
    ;; Printing utility functions
    #:mute
+
+   ;; Convenience functions/macros
+   #:with-result
    ))
 
 (in-package :map)

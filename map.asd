@@ -7,7 +7,8 @@
 	       (:file "conditions")
 	       (:module utilities
 			:components ((:file "printing")
-				     (:file "missing-functions")))
+				     (:file "missing-functions")
+				     (:file "convenience")))
 	       (:module vectors
 			:components ((:file "vector")
 				     (:file "range")
