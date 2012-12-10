@@ -25,13 +25,11 @@
 (declaim (optimize (speed 3)))
 
 (defun mapply (func data)
-  (loop
-     with result = (cl-utilities:copy-array data)  
-     for i from 0 below (array-total-size result)
-     do (setf (row-major-aref result i)
-	      (funcall func (row-major-aref result i)))
-     finally (return result)
-       ))
+  (with-result (result (array-dimensions data))
+    (loop
+       for i from 0 below (array-total-size result)
+       do (setf (row-major-aref result i)
+		(funcall func (row-major-aref result i))))))
 
 (defun tensor-product (A B)
   (declare (type matrix A B))
