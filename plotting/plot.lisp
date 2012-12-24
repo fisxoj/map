@@ -99,9 +99,9 @@
   (with-plot s
     (format s "set pm3d map~%")
     (format s "splot '-' matrix~%")
-    (loop for i from (1- (array-dimension data 0)) downto 0
-       do (loop for j from (1- (array-dimension data 1)) downto 0
-	     do (format s "~g " (aref data i j)))
+    (loop for i from (1- (array-dimension data 1)) downto 0
+       do (loop for j from 0 upto (1- (array-dimension data 0))
+	     do (format s "~g " (aref data j i)))
        do (format s "~%"))
     (format s "e~%")))
 
