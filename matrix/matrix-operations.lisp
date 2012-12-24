@@ -24,6 +24,21 @@
 
 (declaim (optimize (speed 3)))
 
+(defun minor-matrix (matrix &rest subscripts)
+  ;; Result matrix is of dimensions N-1xN-1 compared to the original matrix
+  (with-result (result (apply #'zeros (mapcar #'1- (array-dimensions matrix))))
+    (let ((row-major 0))
+	 (do-matrix (matrix indices)
+	   ;; Don't copy a number if any of the indices matches a sprcified subscript
+	   (unless (reduce (lambda (a b) (or a b)) (mapcar #'= indices subscripts))
+	     (setf (row-major-aref result row-major) (apply #'aref matrix indices))
+	     (incf row-major))))))
+
+(defun random-matrix (&rest dimensions)
+  (with-result (result dimensions)
+    (do-matrix (result subscripts)
+      (setf (apply #'aref result subscripts) (random 1.0d0)))))
+
 (defun mapply (func data)
   (with-result (result (array-dimensions data))
     (loop
