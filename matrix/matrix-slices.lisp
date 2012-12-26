@@ -39,7 +39,7 @@
     ;; pass things along to regular old aref.
     (if (not (every (lambda (a) (= 1 a)) submatrix-dimensions))
 	(reshape-matrix
-	 (with-result (submatrix submatrix-dimensions)
+	 (with-result (submatrix submatrix-dimensions (array-element-type matrix))
 	   (do-matrix (submatrix indices)
 	     (setf (apply #'aref submatrix indices)
 		   (apply #'aref matrix (mapcar #'+ start-points indices))))))

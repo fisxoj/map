@@ -22,7 +22,7 @@
 
 (in-package :map)
 
-(defmacro with-result ((result dimensions) &body body)
-  `(let ((,result (apply #'zeros ,dimensions)))
+(defmacro with-result ((result dimensions &optional element-type) &body body)
+  `(let ((,result (make-array ,dimensions :element-type ,(or `,element-type ''double-float))))
      ,@body
      ,result))
