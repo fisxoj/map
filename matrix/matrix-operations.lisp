@@ -26,7 +26,7 @@
 
 (defun minor-matrix (matrix &rest subscripts)
   ;; Result matrix is of dimensions N-1xN-1 compared to the original matrix
-  (with-result (result (apply #'zeros (mapcar #'1- (array-dimensions matrix))))
+  (with-result (result (mapcar #'1- (array-dimensions matrix)) (array-element-type matrix))
     (let ((row-major 0))
 	 (do-matrix (matrix indices)
 	   ;; Don't copy a number if any of the indices matches a sprcified subscript
@@ -110,7 +110,7 @@
 
 (defmethod .* ((A simple-array) (B vector))
     (with-result (result (array-dimensions B))
-      (loop for i from 0 upto (1- (length B))
+      (loop for i from 0 below (length B)
 	 do (setf (aref result i) (.* B (mref A i t))))))
 
 (defmethod .* ((A vector) (B simple-array))
@@ -120,7 +120,7 @@
 
 (defmethod .* ((A number) (B array))
   (with-result (result (array-dimensions B))
-    (loop for i from 0 upto (1- (array-total-size B))
+    (loop for i from 0 below (array-total-size B)
        do (setf (row-major-aref result i) (* A (row-major-aref B i))))
     result))
 
