@@ -35,3 +35,7 @@
 
 (defmethod sum ((vector vector))
   (loop for i across vector sum i))
+
+
+(defun range (vector min max)
+  (map 'vector (lambda (n) (+ (mod (- n min) (abs (- max min))) min)) vector))
