@@ -43,33 +43,40 @@
 	   (do-matrix (submatrix indices)
 	     (setf (apply #'aref submatrix indices)
 		   (apply #'aref matrix (mapcar #'+ start-points indices))))))
-	(apply #'aref matrix subscripts))))
+	(apply #'aref matrix start-points))))
 
-;; FIXME: Implement.
 (defun (setf mref) (source-matrix target-matrix &rest subscripts)
   (let* ((submatrix-instructions
 	  (%submatrix-instructions (array-dimensions target-matrix) subscripts))
+	 (submatrix-dimensions
+	  (mapcar #'second submatrix-instructions))
 	 (start-points (mapcar #'first submatrix-instructions))
 	 (reduced-dimensions
 	  (remove-if (lambda (a) (= a 1)) (mapcar #'second submatrix-instructions))))
-    (assert (reduce (lambda (a b) (and a b))
-		    (mapcar #'= reduced-dimensions (array-dimensions source-matrix))))
-    (loop
-       for i from 0 upto (1- (array-total-size source-matrix))
-       do (setf (apply #'aref target-matrix
-		       (mapcar #'+ start-points (%row-major-subscript (mapcar #'second submatrix-instructions) i)))
-		(row-major-aref source-matrix i))
-       finally (return target-matrix))))
+    ;; Checking if source-matrix is an array covers the case where mref gets called on a
+    ;; submatrix with 
+    (assert (if (arrayp source-matrix)
+		(reduce (lambda (a b) (and a b))
+			(mapcar #'= reduced-dimensions (array-dimensions source-matrix)))
+		(not reduced-dimensions)))
+    (if (not (every (lambda (a) (= 1 a)) submatrix-dimensions))
+	(loop
+	   for i from 0 upto (1- (array-total-size source-matrix))
+	   do (setf (apply #'aref target-matrix
+			   (mapcar #'+ start-points (row-major-subscripts submatrix-dimensions i)))
+		    (row-major-aref source-matrix i))
+	   finally (return target-matrix))
+	(setf (apply #'aref target-matrix start-points) source-matrix))))
 
 (defun %submatrix-instructions (matrix-dimensions subscripts)
   (assert (= (length matrix-dimensions) (length subscripts)))
   (when subscripts
     (destructuring-bind (sub . rest) subscripts
       (cons
-       (cond
+       (typecase sub
 	 ;; Ranges should have integer values with the exception of the end
 	 ;; which can be -1
-	 ((rangep sub)
+	 (range
 	  (list
 	   (range-start sub)
 	   ;; For the end, accept -1 and calculate the remaining length from
@@ -77,9 +84,9 @@
 	   (cond
 	     ((= (range-stop sub) -1) (- (car matrix-dimensions) (range-start sub)))
 	     (t (range-length sub)))))
-	 ((integerp sub)
+	 (integer
 	  (list sub 1))
-	 ((eq sub t)
+	 (t
 	  (list 0 (car matrix-dimensions))))
        (%submatrix-instructions (cdr matrix-dimensions) rest)))))
 
