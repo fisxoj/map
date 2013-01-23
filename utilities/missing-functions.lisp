@@ -25,7 +25,14 @@
 (defmacro multf (place &optional (delta 1))
   (let ((del (gensym)))
     `(let ((,del ,delta))
-       (setf ,place (* ,place ,del)))))
+       (setf ,place (.* ,place ,del)))))
 
+(declaim (inline 1/))
 (defun 1/ (number)
   (/ 1 number))
+
+(declaim (inline eps=))
+(defun eps= (a b)
+  "Determines if a is within double-float precision of b"
+  (and (> a (- b double-float-epsilon))
+       (< a (+ b double-float-epsilon))))
