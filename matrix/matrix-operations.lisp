@@ -96,17 +96,29 @@
 (defmethod .+ ((A number) (B array))
   (.+ B A))
 
+(defmethod .+ ((A number) (B number))
+  (+ A B))
+
 (defmethod .+ (A B)
   (error ".+ Not implelented for types ~a and ~a" (type-of A) (type-of B)))
 
+(defmethod .* ((A number) (B number))
+  (* A B))
 
 (defmethod .* ((A simple-array) (B simple-array))
   (with-result (result (list (array-dimension A 0) (array-dimension B 1)))
     (do-matrix (result (i j))
       (setf (aref result i j) (dot (mref a i t) (mref b t j))))))
 
+(defmethod .* ((A array) (B array))
+  (with-result (result (list (array-dimension A 0) (array-dimension B 1)))
+    (do-matrix (result (i j))
+      (setf (aref result i j) (dot (mref a i t) (mref b t j))))))
+
 (defmethod .* ((A vector) (B vector))
-  (dot A B))
+  (with-result (result (list (length A) (length B)))
+    (do-matrix (result (i j))
+      (setf (aref result i j) (* (aref A i) (aref B j))))))
 
 (defmethod .* ((A simple-array) (B vector))
     (with-result (result (array-dimensions B))
@@ -150,6 +162,21 @@
     ((= 1 p) A)
     ((> p 1) (.* A (.^ A (1- p))))
     (t (error ".^ Not implemented for non-positive-integer powers"))))
+
+(defgeneric ./ (A B))
+
+(defmethod ./ ((A simple-array) (B number))
+  (with-result (result (array-dimensions A))
+    (do-matrix (result subs)
+      (setf (apply #'aref result subs) (/ (apply #'aref A subs) B)))))
+
+(defmethod ./ ((A vector) (B number))
+  (with-result (result (list (length A)))
+    (do-matrix (A (i))
+      (setf (aref result i) (/ (aref A i) B)))))
+
+(defmethod ./ ((A number) (B number))
+  (/ A B))
 
 ;; FIXME: Make this a method?
 (defun determinant (matrix)
