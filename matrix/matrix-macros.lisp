@@ -24,9 +24,12 @@
 
 (defmacro do-matrix ((matrix &optional subscripts) &body body)
 ;  (assert (or (not subscripts) (= (length subscripts) (array-rank matrix))))
-  (let ((i (gensym)))
-    `(loop for ,i from 0 upto (1- (array-total-size ,matrix))
-	  for ,subscripts = (row-major-subscripts ,matrix ,i)
+  (let ((i (gensym))
+	(dimensions (gensym)))
+    `(loop
+	with ,dimensions = (array-dimensions ,matrix)
+	for ,i from 0 below (array-total-size ,matrix)
+	for ,subscripts = (row-major-subscripts ,dimensions ,i)
 	do (progn ,@body))))
 
 (defmacro as-vector (matrix)
