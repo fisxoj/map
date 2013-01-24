@@ -19,7 +19,8 @@
 				     (:file "matrix-predicates")
 				     (:file "matrix-operations")
 				     (:file "matrix-slices")
-				     ))
+				     (:file "matrix-decomposition")
+				     (:file "matrix-functions")))
 	       (:module calculus
 			:components ((:file "integration")
 				     (:file "rkf45")))

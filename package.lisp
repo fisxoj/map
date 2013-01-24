@@ -61,6 +61,7 @@
    #:inverse
    #:row-major-subscripts
    #:subscripts-row-major
+   #:lu-decomposition
 
    ;; Matrix macros
    #:do-matrix

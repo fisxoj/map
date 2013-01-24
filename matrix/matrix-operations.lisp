@@ -178,31 +178,19 @@
 (defmethod ./ ((A number) (B number))
   (/ A B))
 
-;; FIXME: Make this a method?
-(defun determinant (matrix)
-;  (declare (type matrix matrix))
-  (if (squarep matrix)
-      (let ((length (array-dimension matrix 0)))
-	(loop for i from 0 upto (- length 2)
-	   sum (loop
-		  with positive-terms = 1.0d0
-		  with negative-terms = 1.0d0
-		  for j from 0 upto (1- length)
-		  do (multf positive-terms (aref matrix (mod (+ i j) length) j))
-		  do (multf negative-terms (aref matrix (mod (+ i (* -1 j) -1) length) j))
-;		  do (format t "~a ~a~%" (aref matrix (mod (+ i j) length) j) (aref matrix (mod (+ i (* -1 j) -1) length) j))
-		  finally (return (- positive-terms negative-terms)))))
-      (error 'matrix-not-square)))
+(defun upper-matrix (matrix)
+  (with-result (result (array-dimensions matrix) (array-element-type matrix))
+    (loop
+       for i from 0 below (array-dimension matrix 1) by 1
+       with range = #r(0 -1)
+       do (setf (range-start range) i
+		(mref result i range ) (mref matrix i range)))))
 
-(defun inverse (matrix)
-;  (declare (type matrix matrix))
-  (.* (1/ (determinant matrix))
-      (adjugate matrix)))
+(defun lower-matrix (matrix)
+  (with-result (result (array-dimensions matrix) (array-element-type matrix))
+    (loop
+       for i from 0 below (array-dimension matrix 1) by 1
+       with range = #r(0 -1)
+       do (setf (range-start range) i
+		(mref result range i) (mref matrix range i)))))
 
-(defun adjugate (matrix)
-  (with-result (result (array-dimensions matrix))
-    (do-matrix (result subscripts)
-      (setf (apply #'aref result subscripts)
-	    ;; -1^(i+j+k+...) power * determinant of the minor matrix
-	    (* (expt -1 (reduce #'+ (mapcar #'1+ subscripts)))
-	       (determinant (apply #'minor-matrix matrix subscripts)))))))
