@@ -79,9 +79,9 @@
 			(list plot-sexps))))
 
     (with-plot (stream terminal pathspec)
-       (when title (format stream "set title ~S~%" title))
-       (when x-label (format stream "set xlabel ~S~%" x-label))
-       (when y-label (format stream "set ylabel ~S~%" y-label))
+      (when title (format stream "set title ~S~%" title))
+      (when x-label (format stream "set xlabel ~S~%" x-label))
+      (when y-label (format stream "set ylabel ~S~%" y-label))
 
       ;; Write line styles to stream
       (loop
@@ -98,15 +98,15 @@
 		    "'-' using 1:2 ls ~d title ~S with ~a"
 		    number
 		    (or (getf plot :title) "")
-		    (or (case (getf plot :line-style)
-			  (:lines "lines")
-			  (:points "points")
-			  (:lines-points "linespoints")
-			  (:impulses "impulses")
-			  (:dots "dots")
-			  (:steps "steps")
-			  ;; FIXME: Add others once we can parse more vectors (errorbars)
-			  (t "lines"))))
+		    (case (getf plot :line-style)
+		      (:lines "lines")
+		      (:points "points")
+		      (:lines-points "linespoints")
+		      (:impulses "impulses")
+		      (:dots "dots")
+		      (:steps "steps")
+		      ;; FIXME: Add others once we can parse more vectors (errorbars)
+		      (t "lines")))
 	 unless (= (length plot-sexps) number)
 	 do (princ ", " stream)
 	 finally (princ #\Newline stream))
