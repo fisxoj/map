@@ -38,7 +38,7 @@
   (let* ((sexp (read stream t)))
     (ecase (length sexp)
       (3 `(make-instance 'range :start ,(first sexp) :delta ,(second sexp) :stop ,(third sexp)))
-      (2 `(make-instance 'range :start ,(first sexp) :delta ,(max (signum (- (second sexp) (first sexp))) 1) :stop ,(second sexp))))))
+      (2 `(make-instance 'range :start ,(first sexp) :delta (max (signum (- ,(second sexp) ,(first sexp))) 1) :stop ,(second sexp))))))
 
 (set-dispatch-macro-character #\# #\r #'range-macro)
 
