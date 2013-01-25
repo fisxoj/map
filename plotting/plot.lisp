@@ -35,7 +35,7 @@
   `(let ((gnuplot (ensure-gnuplot-connection)))
      (with-open-stream (,stream (external-program:process-input-stream gnuplot))
 					;with-open-file (,stream #p"./test" :direction :output :if-exists :supersede)
-       (format ,stream "set term ~a font ~S~%" (string-downcase ,terminal) *gnuplot-font*)
+       (format ,stream "set term ~a enhanced font ~S~%" (string-downcase ,terminal) *gnuplot-font*)
        (when ,pathspec (format ,stream "set output ~S~%" (namestring ,pathspec)))
        ,@body)))
 
