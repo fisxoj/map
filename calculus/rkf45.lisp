@@ -23,7 +23,7 @@
 (in-package #:map)
 
 (defun rkf45 (func range y0 &optional (tolerance 1d-7))
-  "rkf56
+  "rkf45
 Implementation of the Runge-Kutta-Feldberg differential equation solver.
 
 func: function handle that should accept a time, ti, and a Nx2
@@ -37,7 +37,7 @@ tolerance: tolerance"
 	 (ts (make-array array-length :element-type 'double-float :adjustable t))
 	 (step (/ (- (range-stop range) (range-start range)) 1d2)))
     (declare (type function func)
-	     (type double-float tolerance)
+	     (type double-float tolerance step)
 	     (type (simple-vector *) y0))
     ;; Set initial conditions from y0
     (setf (aref ts 0) (range-start range))
@@ -61,13 +61,39 @@ tolerance: tolerance"
 	     with looped = nil
 ;;	     do (format t "Step size: ~g~%" step)
 	     do (let* ((k1 (.* step (funcall func ti yi)))
-		       (k2 (.* step (funcall func (+ ti (* 1/4 step)) (.+ yi (.* 1/4 k1)))))
-		       (k3 (.* step (funcall func (+ ti (* 3/8 step)) (reduce #'.+ (list yi (.* 3/32 k1) (.* 9/32 k2))))))
-		       (k4 (.* step (funcall func (+ ti (* 12/13 step)) (reduce #'.+ (list yi (.* 1932/2197 k1) (.* -7200/2197 k2) (.* 7296/2197 k3))))))
-		       (k5 (.* step (funcall func (+ ti step) (reduce #'.+ (list yi (.* 439/216 k1) (.* -8 k2) (.* 3680/513 k3) (.* -845/4104 k4))))))
-		       (k6 (.* step (funcall func (+ ti (* 1/2 step)) (reduce #'.+ (list yi (.* -8/27 k1) (.* 2 k2) (.* -3544/2565 k3) (.* 1859/4104 k4) (.* -11/40 k5))))))
-		       (rk4 (the (simple-array double-float *) (reduce #'.+ (list yi (.* 25/216 k1) (.* 1408/2565 k3) (.* 2197/4104 k4) (.* -1/5 k5)))))
-		       (rk5 (the (simple-array double-float *) (reduce #'.+ (list yi (.* 16/135 k1) (.* 6656/12825 k3) (.* 28561/56430 k4) (.* -9/50 k5) (.* 2/55 k6)))))
+		       (k2 (.* step (funcall func (+ ti (* .25d0 step)) (.+ yi (.* .25d0 k1)))))
+		       (k3 (.* step (funcall func (+ ti (* .375d0 step))
+					     (reduce #'.+ (list yi (.* .09375d0 k1) (.* 0.28125d0 k2))))))
+		       (k4 (.* step (funcall func (+ ti (* 0.9230769230769231d0 step))
+					     (reduce #'.+ (list yi
+								(.* 0.8793809740555303d0 k1) 
+								(.* -3.277196176604461d0 k2)
+								(.* 3.3208921256258535d0 k3))))))
+		       (k5 (.* step (funcall func (+ ti step)
+					     (reduce #'.+ (list yi
+								(.* 2.0324074074074074d0 k1)
+								(.* -8d0 k2) (.* 7.173489278752436d0 k3)
+								(.* -0.20589668615984405d0 k4))))))
+		       (k6 (.* step (funcall func (+ ti (* .5d0 step))
+					     (reduce #'.+ (list yi
+								(.* -0.2962962962962963d0 k1)
+								(.* 2d0 k2)
+								(.* -1.3816764132553607d0 k3)
+								(.* 0.4529727095516569d0 k4)
+								(.* -0.275d0 k5))))))
+		       (rk4 (the (simple-array double-float *)
+			      (reduce #'.+ (list yi
+						 (.* 0.11574074074074074d0 k1)
+						 (.* 0.5489278752436647d0 k3)
+						 (.* 0.5353313840155945d0 k4)
+						 (.* -.2d0 k5)))))
+		       (rk5 (the (simple-array double-float *)
+			      (reduce #'.+ (list yi
+						 (.* 0.11851851851851852d0 k1)
+						 (.* 0.5189863547758284d0 k3)
+						 (.* 0.5061314903420167d0 k4)
+						 (.* -0.18d0 k5)
+						 (.* 0.03636363636363636d0 k6)))))
 		       (err (/ (max (the double-float (norm (.- rk5 rk4))) double-float-epsilon)
 			       tolerance)))
 		  (declare (type double-float err))
@@ -78,7 +104,7 @@ tolerance: tolerance"
 		 (or (> (abs err) 1d0)
 		     ;; I'm pretty ok with things being a bit too precise for now
 		     (< (abs err) 1d-3)))
-	    (setf step (* step 8d-1 (expt (* 2d0 err) -1/6))
+	    (setf step (* step 8d-1 (the double-float (expt (* 2d0 err) -1/6)))
 		  looped t)
 	    
 	    ;; Error is low enough, keep the value
