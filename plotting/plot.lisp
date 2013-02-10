@@ -29,7 +29,7 @@
 (defparameter *gnuplot-font* "/usr/share/fonts/bitstream-vera/Vera.ttf,12")
 
 (defmacro with-plot ((stream &optional terminal pathspec) &body body)
-  (when (and (member terminal '(:eps :ps :png :jpg))
+  (when (and (member terminal '(:eps :ps :png :jpg :svg))
 	     (not pathspec))
     (error "Attempting to plot to a file with no pathspec given"))
   `(let ((gnuplot (ensure-gnuplot-connection)))
