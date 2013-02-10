@@ -70,6 +70,9 @@
    ;; Vector operations
    #:norm
    #:dot
+   #:mean
+   #:standard-deviation
+   #:sum
 
    ;; Calculus
    #:riemann

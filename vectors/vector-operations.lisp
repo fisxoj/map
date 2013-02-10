@@ -39,3 +39,9 @@
 
 (defun range (vector min max)
   (map 'vector (lambda (n) (+ (mod (- n min) (abs (- max min))) min)) vector))
+
+(defun standard-deviation (vector)
+  (declare (optimize speed))
+  (loop
+     with x-bar = (mean vector)
+     for x across vector sum (expt (- x x-bar) 2)))
