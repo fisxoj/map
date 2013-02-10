@@ -38,7 +38,8 @@ tolerance: tolerance"
 	 (step (/ (- (range-stop range) (range-start range)) 1d2)))
     (declare (type function func)
 	     (type double-float tolerance step)
-	     (type (simple-vector *) y0))
+	     (type (simple-vector *) y0)
+	     (type (function (double-float (vector double-float)) (vector double-float)) func))
     ;; Set initial conditions from y0
     (setf (aref ts 0) (range-start range))
     (loop for j from 0 upto (1- array-width)
