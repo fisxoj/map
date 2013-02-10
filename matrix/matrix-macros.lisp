@@ -32,6 +32,18 @@
 	for ,subscripts = (row-major-subscripts ,dimensions ,i)
 	do (progn ,@body))))
 
+(defmacro do-matrix-with-result ((matrix subscripts result result-dimensions &optional (element-type 'double-float)) &body body)
+;  (assert (or (not subscripts) (= (length subscripts) (array-rank matrix))))
+  (let ((i (gensym))
+	(dimensions (gensym)))
+    `(loop
+	with ,result = (make-array ,result-dimensions :element-type (quote ,element-type))
+	with ,dimensions = (array-dimensions ,matrix)
+	for ,i from 0 below (array-total-size ,matrix)
+	for ,subscripts = (row-major-subscripts ,dimensions ,i)
+	do (progn ,@body)
+	finally (return ,result))))
+
 (defmacro as-vector (matrix)
   `(make-array (array-total-size ,matrix)
 	       :element-type (array-element-type ,matrix)

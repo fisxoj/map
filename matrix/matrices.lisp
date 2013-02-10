@@ -41,16 +41,17 @@
      do (setf (aref m i i) 1.0d0)
      finally (return m)))
 
-(defun row-major-subscripts (matrix-dimensions row-major-index)
-  ;; I'm so sorry about this
-  (nreverse (%row-major-subscript (reverse matrix-dimensions) row-major-index)))
+(declaim (inline row-major-subscripts))
 
-(defun %row-major-subscript (matrix-dimensions row-major-index)
+(defun row-major-subscripts (matrix-dimensions row-major-index)
+  (declare (optimize speed))
   (loop
-     for i in matrix-dimensions
-     for rmi = row-major-index then m
-     for (m r) = (multiple-value-list (floor rmi i))
-     collect r))
+     with p
+     for i of-type fixnum in (reverse matrix-dimensions)
+     for rmi of-type fixnum = row-major-index then m
+     for (m r) (fixnum fixnum) = (multiple-value-list (floor rmi i))
+     do (push r p)
+     finally (return p)))
 
 (defun subscripts-row-major (matrix &rest subscripts)
   (let ((array-dimensions (array-dimensions matrix))
