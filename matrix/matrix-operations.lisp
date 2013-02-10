@@ -26,18 +26,16 @@
 
 (defun minor-matrix (matrix &rest subscripts)
   ;; Result matrix is of dimensions N-1xN-1 compared to the original matrix
-  (with-result (result (mapcar #'1- (array-dimensions matrix)) (array-element-type matrix))
-    (let ((row-major 0))
-	 (do-matrix (matrix indices)
-	   ;; Don't copy a number if any of the indices matches a sprcified subscript
-	   (unless (reduce (lambda (a b) (or a b)) (mapcar #'= indices subscripts))
-	     (setf (row-major-aref result row-major) (apply #'aref matrix indices))
-	     (incf row-major))))))
+  (let ((row-major 0))
+    (do-matrix-with-result (matrix indices result (mapcar #'1- (array-dimensions matrix)) (array-element-type matrix))
+      ;; Don't copy a number if any of the indices matches a sprcified subscript
+      (unless (reduce (lambda (a b) (or a b)) (mapcar #'= indices subscripts))
+	(setf (row-major-aref result row-major) (apply #'aref matrix indices))
+	(incf row-major)))))
 
 (defun random-matrix (&rest dimensions)
-  (with-result (result dimensions)
-    (do-matrix (result subscripts)
-      (setf (apply #'aref result subscripts) (random 1.0d0)))))
+  (do-matrix-with-result (result subscripts result dimensions)
+    (setf (apply #'aref result subscripts) (random 1.0d0))))
 
 (defun mapply (func data)
   (with-result (result (array-dimensions data))
@@ -67,10 +65,8 @@
 	 sum (aref M i i))))
 
 (defun transpose (matrix)
-  (let ((result (make-array (nreverse (array-dimensions matrix)))))
-    (do-matrix (result (i j))
-      (setf (aref result i j) (aref matrix j i)))
-    result))
+  (do-matrix-with-result (result (i j) result (nreverse (array-dimensions matrix)))
+    (setf (aref result i j) (aref matrix j i))))
 
 (defgeneric .+ (A B)
   (:documentation "Matrix addition function, will also add single numbers elementwise to the matrix."))
@@ -102,30 +98,44 @@
 (defmethod .+ (A B)
   (error ".+ Not implelented for types ~a and ~a" (type-of A) (type-of B)))
 
+(defgeneric .* (A B))
+
 (defmethod .* ((A number) (B number))
+  (declare (optimize speed)
+	   (type double-float A B))
   (* A B))
 
 (defmethod .* ((A simple-array) (B simple-array))
-  (with-result (result (list (array-dimension A 0) (array-dimension B 1)))
-    (do-matrix (result (i j))
-      (setf (aref result i j) (dot (mref a i t) (mref b t j))))))
+  (declare (optimize speed)
+	   (type (simple-array double-float (* *)) A B))
+  (do-matrix-with-result (result (i j) result (list (array-dimension A 0) (array-dimension B 1)))
+    (setf (aref result i j) (dot (mref a i t) (mref b t j)))))
 
 (defmethod .* ((A array) (B array))
-  (with-result (result (list (array-dimension A 0) (array-dimension B 1)))
-    (do-matrix (result (i j))
-      (setf (aref result i j) (dot (mref a i t) (mref b t j))))))
+  (declare (optimize speed)
+	   (type (vector double-float) A)
+	   (type (array double-float (* *)) B))
+  (do-matrix-with-result (result (i j) result (list (array-dimension A 0) (array-dimension B 1)))
+    (setf (aref result i j) (dot (mref a i t) (mref b t j)))))
 
 (defmethod .* ((A vector) (B vector))
-  (with-result (result (list (length A) (length B)))
-    (do-matrix (result (i j))
-      (setf (aref result i j) (* (aref A i) (aref B j))))))
+  (declare (optimize speed)
+	   (type (vector double-float *) A B))
+  (do-matrix-with-result (result (i j) result (list (length A) (length B)))
+    (setf (aref result i j) (* (aref A i) (aref B j)))))
 
 (defmethod .* ((A simple-array) (B vector))
+    (declare (optimize speed)
+	   (type (simple-array double-float (* *)) A)
+	   (type (vector double-float) B))
     (with-result (result (array-dimensions B))
       (loop for i from 0 below (length B)
 	 do (setf (aref result i) (.* B (mref A i t))))))
 
 (defmethod .* ((A vector) (B simple-array))
+  (declare (optimize speed)
+	   (type (vector double-float) A)
+	   (type (simple-array double-float (* *)) B))
   (with-result (result (list (length A)))
     (loop for i from 0 below (1- (length A))
        do (setf (aref result i) (.* A (mref B i t))))))
@@ -136,24 +146,55 @@
        do (setf (row-major-aref result i) (* A (row-major-aref B i))))
     result))
 
+(defmethod .* ((A number) (B simple-array))
+  (declare (optimize speed)
+	   (type double-float A)
+	   (type (simple-array double-float) B))
+  (with-result (result (array-dimensions B))
+    (loop for i from 0 below (array-total-size B)
+       do (setf (row-major-aref result i) (* A (row-major-aref B i))))
+    result))
+
+(defmethod .* ((A number) (B array))
+  (declare (optimize speed)
+	   (type double-float A)
+	   (type (array double-float) B))
+  (with-result (result (array-dimensions B))
+    (loop for i from 0 below (array-total-size B)
+       do (setf (row-major-aref result i) (* A (row-major-aref B i))))
+    result))
+
 (defmethod .* ((A array) (B number))
   (.* B A))
 
 (defmethod .* ((A number) (B vector))
-  (with-result (result (list (length B)))
-    (do-matrix (B (i))
-      (setf (aref result i) (* A (aref B i))))))
+  (declare (optimize speed)
+	   (type double-float A)
+	   (type (vector double-float) B))
+  (do-matrix-with-result (B (i) result (list (length B)))
+    (setf (aref result i) (* A (aref B i)))))
+
+(defmethod .* ((A number) (B simple-vector))
+  (declare (optimize speed)
+	   (type double-float A)
+	   (type simple-vector B))
+  (do-matrix-with-result (B (i) result (list (length B)))
+    (setf (aref result i) (* A (aref B i)))))
 
 (defmethod .* ((A vector) (B number))
   (.* B A))
 
+(defgeneric .- (A B))
+
 (defmethod .- (A B)
-  (.+ A (.* -1 B)))
+  (.+ A (.* -1d0 B)))
 
 (defmethod norm ((matrix array))
   (.* (1/ (loop for element across (as-vector matrix)
 	     maximize element))
       matrix))
+
+(defgeneric .^ (A B))
 
 (defmethod .^ ((A array) (p integer))
   (assert (squarep A))
@@ -166,14 +207,12 @@
 (defgeneric ./ (A B))
 
 (defmethod ./ ((A simple-array) (B number))
-  (with-result (result (array-dimensions A))
-    (do-matrix (result subs)
-      (setf (apply #'aref result subs) (/ (apply #'aref A subs) B)))))
+  (do-matrix-with-result (result subs result (array-dimensions A))
+    (setf (apply #'aref result subs) (/ (apply #'aref A subs) B))))
 
 (defmethod ./ ((A vector) (B number))
-  (with-result (result (list (length A)))
-    (do-matrix (A (i))
-      (setf (aref result i) (/ (aref A i) B)))))
+  (do-matrix-with-result (A (i) result (list (length A)))
+    (setf (aref result i) (/ (aref A i) B))))
 
 (defmethod ./ ((A number) (B number))
   (/ A B))
