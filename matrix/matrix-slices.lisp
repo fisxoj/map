@@ -30,6 +30,7 @@
 
 (defun mref (matrix &rest subscripts)
   "Functions like (aref), but accepts ranges or T and returns a submatrix of matrix."
+  (declare (optimize speed space (safety 0)))
   (let* ((submatrix-instructions
 	  (%submatrix-instructions (array-dimensions matrix) subscripts))
 	 (submatrix-dimensions
@@ -37,7 +38,7 @@
 	 (start-points (mapcar #'first submatrix-instructions)))
     ;; If submatrix-dimensions is nil, the array has one element and we should just
     ;; pass things along to regular old aref.
-    (if (not (every (lambda (a) (= 1 a)) submatrix-dimensions))
+    (if (not (every (lambda (a) (= 1 (the fixnum a))) submatrix-dimensions))
 	(reshape-matrix
 	 (with-result (submatrix submatrix-dimensions (array-element-type matrix))
 	   (do-matrix (submatrix indices)
@@ -46,6 +47,7 @@
 	(apply #'aref matrix start-points))))
 
 (defun (setf mref) (source-matrix target-matrix &rest subscripts)
+  (declare (optimize speed space (safety 0)))
   (let* ((submatrix-instructions
 	  (%submatrix-instructions (array-dimensions target-matrix) subscripts))
 	 (submatrix-dimensions
