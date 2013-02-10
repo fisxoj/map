@@ -30,35 +30,36 @@
 	 ;; The permutation vector will hold the
 	 (p nil)
 	 ;; Copy matrix into U
-	 (U (.* 1d0 matrix)))
+	 (U (.* 1d0 matrix))
+	 (rows (make-instance 'range :stop (1- length) :delta 1))
+	 (temp nil))
 
-    (declare (optimize speed (safety 0) (debug 0))
+    (declare (optimize speed (safety 1) (debug 0))
 	     (type (simple-array double-float) U))
 
-    (loop
-       with rows = (make-instance 'range :stop (1- length) :delta 1)
-       with temp = nil
-       for k of-type integer from 0 below (1- length)
-       
-       ;; Pivoting
-       do (progn (setf (range-start rows) k)
-		 ;; There seems to be an error in the book where the permutations should happen
-		 ;; to a whole row, now just k:n columns of it
-		 (let ((ps (+ k (first (permutation-list (mref U rows t))))))
-		   (declare (type integer ps))
-		   ;; If the most significant row is the k-th row, don't juggle it with itself
-		   
-		   (unless (= k ps)
-		     (push ps p)
-		     (setf temp (mref U k t)
-			   (mref U k t) (mref U ps t)
-			   (mref U ps t) temp))))
+    (dotimes (k length)
 
-       unless (eps= (aref U k k) 0.0)
-       ;; wow, this is straightforward with (mref), hopefully it's not super slow
-       do (setf  (range-start rows) (1+ k)
-		 (mref U rows k) (./ (mref U rows k) (aref U k k))
-		 (mref U rows rows) (.- (mref U rows rows) (.* (mref U rows k) (mref U k rows)))))
+      (setf (range-start rows) k)
+      ;; There seems to be an error in the book where the permutations should happen
+      ;; to a whole row, now just k:n columns of it
+      (let ((ps (loop with max = 0d0 with row = 0 for i from k below length for v = (aref U i k)
+		     when (> v max)
+		     do (setf max v) and do (setf row i)
+		     finally (return row))))
+	(declare (type integer ps))
+	;; If the most significant row is the k-th row, don't juggle it with itself
+	
+	(unless (= k ps)
+	  (push ps p)
+	  (setf temp (mref U k t)
+		(mref U k t) (mref U ps t)
+		(mref U ps t) temp)))
+
+      (unless (eps= (aref U k k) 0.0)
+	;; wow, this is straightforward with (mref), hopefully it's not super slow
+	(setf  (range-start rows) (1+ k)
+	       (mref U rows k) (./ (mref U rows k) (aref U k k))
+	       (mref U rows rows) (.- (mref U rows rows) (.* (mref U rows k) (mref U k rows))))))
     ;; Finish the p-vector
 
     (values
@@ -70,14 +71,13 @@
      (upper-matrix U)
      (reverse p))))
 
-(defun permutation-list (matrix &key (sort #'>) (column 0))
+(defun permutation-list (matrix &key (sort #'>) (column 0) (start 0))
   (declare (optimize (speed 3))
-	   (type array matrix)
 	   (type function sort))
   (mapcar
        #'second
        (sort (loop
-		for i from 0 below (array-dimension matrix 0)
+		for i from start below (array-dimension matrix 0)
 		collect (list (aref matrix i column) i))
 	     sort :key (lambda (n) (abs (car n))))))
 
