@@ -27,7 +27,7 @@
     (declare (ignore l))
     ;; L is unitriangular, so (det L) == 1
     (loop
-       with u-terms = 1.0
+       with u-terms = 1d0
        for i from 0 below (array-dimension matrix 0)
        do (multf u-terms (aref u i i))
        finally (return (* u-terms (expt -1.0 (length p)))))))
