@@ -51,7 +51,7 @@
    #:eye
    #:zeros
    #:ones
-   #:czeros
+   #:complex-zeros
    #:random-matrix
    #:mtrace
    #:mapply

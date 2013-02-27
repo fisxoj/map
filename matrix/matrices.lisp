@@ -32,7 +32,7 @@
 (defun ones (&rest dimensions)
   (make-array dimensions :element-type 'double-float :initial-element 1.0d0))
 
-(defun czeros (&rest dimensions)
+(defun complex-zeros (&rest dimensions)
   (make-array dimensions :element-type '(complex double-float) :initial-element #c(0.0d0 0.0d0)))
 
 (defun eye (dimension)
