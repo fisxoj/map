@@ -92,6 +92,9 @@
 
    ;; Convenience functions/macros
    #:with-result
+
+   ;; Equality checking
+   #:eps=
    ))
 
 (in-package :map)
