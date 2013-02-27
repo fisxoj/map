@@ -17,6 +17,7 @@
 			:components ((:file "matrices")
 				     (:file "matrix-macros")
 				     (:file "matrix-predicates")
+				     (:file "matrix-multiply")
 				     (:file "matrix-operations")
 				     (:file "matrix-slices")
 				     (:file "matrix-decomposition")
