@@ -52,6 +52,7 @@
    #:zeros
    #:ones
    #:complex-zeros
+   #:make-plane
    #:random-matrix
    #:mtrace
    #:mapply

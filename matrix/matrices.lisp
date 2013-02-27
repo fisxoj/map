@@ -41,6 +41,24 @@
      do (setf (aref m i i) 1.0d0)
      finally (return m)))
 
+(defmacro make-plane (range1 range2 function &optional (element-type ''double-float))
+  (let ((result (gensym))
+	(l1 (gensym))
+	(l2 (gensym))
+	(i (gensym))
+	(j (gensym)))
+    `(let* ((,l1 (range-length ,range1))
+	    (,l2 (range-length ,range2))
+	    (,result (make-array (list ,l1 ,l2) :element-type ,element-type)))
+       (declare (optimize speed))
+       (loop for ,j of-type fixnum from 0 below ,l2
+	    do (loop for ,i of-type fixnum from 0 below ,l1
+		    do (setf (aref ,result ,i ,j)
+			     (funcall ,function
+				      (+ (range-start ,range1) (* ,i (range-delta ,range1)))
+				      (+ (range-start ,range2) (* ,j (range-delta ,range2))))))
+	    finally (return ,result)))))
+
 (declaim (inline row-major-subscripts))
 
 (defun row-major-subscripts (matrix-dimensions row-major-index)
