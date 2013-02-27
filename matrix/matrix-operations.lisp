@@ -34,8 +34,26 @@
 	(incf row-major)))))
 
 (defun random-matrix (&rest dimensions)
-  (do-matrix-with-result (result subscripts result dimensions)
-    (setf (apply #'aref result subscripts) (random 1.0d0))))
+  (declare (optimize speed (safety 0) (debug 1)))
+  (let* ((result (apply #'zeros dimensions))
+	 (total-size (reduce #'* dimensions)))
+    (declare (type fixnum total-size)
+	     (type (simple-array double-float) result))
+    (loop for i of-type fixnum from 0 below total-size do
+	 (setf (row-major-aref result i)
+	       (random 1d0)))
+    result))
+
+(defun complex-random-matrix (&rest dimensions)
+  (declare (optimize speed (safety 0) (debug 1)))
+  (let* ((result (apply #'complex-zeros dimensions))
+	 (total-size (reduce #'* dimensions)))
+    (declare (type fixnum total-size)
+	     (type (simple-array (complex double-float)) result))
+    (loop for i of-type fixnum from 0 below total-size do
+	 (setf (row-major-aref result i)
+	       (complex (random 1d0) (random 1d0))))
+    result))
 
 (defun mapply (func data)
   (with-result (result (array-dimensions data))
@@ -237,4 +255,3 @@
        with range = #r(0 -1)
        do (setf (range-start range) i
 		(mref result range i) (mref matrix range i)))))
-

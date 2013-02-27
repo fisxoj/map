@@ -54,6 +54,7 @@
    #:complex-zeros
    #:make-plane
    #:random-matrix
+   #:complex-random-matrix
    #:mtrace
    #:mapply
    #:mref
