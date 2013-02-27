@@ -44,4 +44,5 @@
   (declare (optimize speed))
   (loop
      with x-bar = (mean vector)
-     for x across vector sum (expt (- x x-bar) 2)))
+     for x across vector sum (expt (- x x-bar) 2) into sum
+     finally (return (/ sum (length vector)))))
