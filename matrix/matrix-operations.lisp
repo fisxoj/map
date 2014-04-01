@@ -142,18 +142,63 @@
     (setf (aref result i j) (dot (mref a i t) (mref b t j)))))
 
 (defmethod .* ((A vector) (B vector))
-  (declare (optimize speed)
-	   (type (vector double-float *) A B))
-  (do-matrix-with-result (result (i j) result (list (length A) (length B)))
-    (setf (aref result i j) (* (aref A i) (aref B j)))))
+  (declare (optimize speed (safety 0)))
+  (let ((rows (length A))
+	(cols (length B)))
+    (if (eq (array-element-type A) 'double-float)
+	(if (eq (array-element-type B) 'double-float)
 
-(defmethod .* ((A simple-array) (B vector))
+	    ;; A and B are real
+
+	    (let ((result (zeros rows cols)))
+	      (declare (type (simple-array double-float (* *)) result)
+		       (type (vector double-float) A B))
+	      (dotimes (j cols)
+		(dotimes (i rows)
+		  (setf (aref result i j) (* (the double-float (elt A i)) (the double-float (elt B j))))))
+	      (return-from .* result))
+
+	    ;; A is real and B is complex
+
+	    (let ((result (complex-zeros rows cols)))
+	      (declare (type (simple-array (complex double-float) (* *)) result)
+		       (type (simple-array double-float (*)) A)
+		       (type (simple-array (complex double-float) (*)) B))
+	      (dotimes (j cols)
+		(dotimes (i rows)
+		  (setf (aref result i j) (* (aref A i) (aref B j)))))
+	      (return-from .* result)))
+
+	(if (eq (array-element-type B) 'double-float)
+
+	    ;; A is complex and B is real
+
+	    (let ((result (complex-zeros rows cols)))
+	      (declare (type (simple-array (complex double-float) (* *)) result)
+		       (type (simple-array (complex double-float) (*)) A)
+		       (type (simple-array double-float (*)) B))
+	      (dotimes (j cols)
+		(dotimes (i rows)
+		  (setf (aref result i j) (* (aref A i) (aref B j)))))
+	      (return-from .* result))
+
+	    ;; A and B are complex
+
+	    (let ((result (complex-zeros rows cols)))
+	      (declare (type (simple-array (complex double-float) (* *)) result)
+		       (type (simple-array (complex double-float) (*)) A B))
+	      (dotimes (j cols)
+		(dotimes (i rows)
+		  (setf (aref result i j) (* (aref A i) (aref B j)))))
+	      (return-from .* result)))))
+
+  (defmethod .* ((A simple-array) (B vector))
     (declare (optimize speed)
-	   (type (simple-array double-float (* *)) A)
-	   (type (vector double-float) B))
+	     (type (simple-array double-float (* *)) A)
+	     (type (vector double-float) B))
     (with-result (result (array-dimensions B))
       (loop for i from 0 below (length B)
-	 do (setf (aref result i) (.* B (mref A i t))))))
+	 do (setf (aref result i) (.* B (mref A i t)))))))
 
 (defmethod .* ((A vector) (B simple-array))
   (declare (optimize speed)
@@ -191,11 +236,53 @@
   (.* B A))
 
 (defmethod .* ((A number) (B vector))
-  (declare (optimize speed)
-	   (type double-float A)
-	   (type (vector double-float) B))
-  (do-matrix-with-result (B (i) result (list (length B)))
-    (setf (aref result i) (* A (aref B i)))))
+  (declare (optimize speed))
+  (if (typep A 'double-float)
+      ;; A is real
+      (if (typep B '(vector double-float))
+	  ;; B is real
+	  (let* ((length (length B))
+		 (result (zeros length)))
+	    (declare (type double-float A)
+		     (type (simple-array double-float (*)) result)
+		     (type (vector double-float) B))
+	    (dotimes (i length)
+	      (setf (aref result i) (* A (aref B i))))
+	    (return-from .* result))
+
+	  ;; B is complex
+	  (let* ((length (length B))
+		 (result (complex-zeros length)))
+	    (declare (type double-float A)
+		     (type (simple-array (complex double-float) (*)) result)
+		     (type (vector (complex double-float)) B))
+	    (dotimes (i length)
+	      (setf (aref result i) (* A (aref B i))))
+	    (return-from .* result)))
+
+      ;; A is complex
+
+      (if (typep B '(vector double-float))
+
+	  ;; B is real
+	  (let* ((length (length B))
+		 (result (complex-zeros length)))
+	    (declare (type (complex double-float) A)
+		     (type (simple-array (complex double-float) (*)) result)
+		     (type (vector double-float) B))
+	    (dotimes (i length)
+	      (setf (aref result i) (* A (aref B i))))
+	    (return-from .* result))
+
+	  ;; B is complex
+	  (let* ((length (length B))
+		 (result (complex-zeros length)))
+	    (declare (type (complex double-float) A)
+		     (type (simple-array (complex double-float) (*)) result)
+		     (type (vector (complex double-float)) B))
+	    (dotimes (i length)
+	      (setf (aref result i) (* A (aref B i))))
+	    (return-from .* result)))))
 
 (defmethod .* ((A number) (B simple-vector))
   (declare (optimize speed)

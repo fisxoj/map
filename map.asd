@@ -5,6 +5,7 @@
   :author "Matt Novenstern <fisxoj@gmail.com>"
   :components ((:file "package")
 	       (:file "conditions")
+	       (:file "types")
 	       (:module utilities
 			:components ((:file "printing")
 				     (:file "missing-functions")

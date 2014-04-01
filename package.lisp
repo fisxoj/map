@@ -95,7 +95,6 @@
    #:with-result
 
    ;; Equality checking
-   #:eps=
-   ))
+   #:eps=))
 
 (in-package :map)

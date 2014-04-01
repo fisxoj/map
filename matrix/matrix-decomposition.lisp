@@ -25,14 +25,13 @@
 (defun lu-decomposition (matrix)
   "Performs the LU decomposition of the matrix according to Golub & Van Loan, Matrix Computations, Algorithm 3.4.1, as referenced by the GSL docs."
   ;; See: http://books.google.com/books?id=mlOa7wPX6OYC&lpg=PA114&ots=lcfrg9N7fY&dq=Golub%20%26%20Van%20Loan%2C%20Matrix%20Computations%2C%20Algorithm%203.4.1&pg=PA112#v=onepage&q=Golub%20&%20Van%20Loan,%20Matrix%20Computations,%20Algorithm%203.4.1&f=false
-  (declare (optimize speed))
+  (declare (optimize speed (safety 0)))
   (let* ((length (array-dimension matrix 0))
 	 ;; The permutation vector will hold the
 	 (p nil)
 	 ;; Copy matrix into U
 	 (U (.* 1d0 matrix))
-	 (rows (make-instance 'range :stop (1- length) :delta 1))
-	 (temp nil))
+	 (rows (make-instance 'range :stop (1- length) :delta 1)))
 
     (declare (optimize speed (safety 1) (debug 0))
 	     (type (simple-array double-float) U))
@@ -42,7 +41,12 @@
       (setf (range-start rows) k)
       ;; There seems to be an error in the book where the permutations should happen
       ;; to a whole row, now just k:n columns of it
-      (let ((ps (loop with max = 0d0 with row = 0 for i from k below length for v = (aref U i k)
+      (let ((ps (loop
+		   with max double-float = 0d0
+		   with row integer = 0 
+		   for i of-type integer from k below length
+		   for v double-float = (aref U i k)
+
 		     when (> v max)
 		     do (setf max v) and do (setf row i)
 		     finally (return row))))
@@ -51,9 +55,7 @@
 	
 	(unless (= k ps)
 	  (push ps p)
-	  (setf temp (mref U k t)
-		(mref U k t) (mref U ps t)
-		(mref U ps t) temp)))
+	  (rotatef (mref U k t) (mref U ps t))))
 
       (unless (eps= (aref U k k) 0.0)
 	;; wow, this is straightforward with (mref), hopefully it's not super slow
@@ -86,4 +88,3 @@
     (with-result (result (list l l))
       (dotimes (i l)
 	(setf (aref result i (elt p-list i)) 1d0)))))
-
