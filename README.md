@@ -26,7 +26,7 @@ CL-USER> #v(1 .5 10)
 
 CL-USER> #v(1 .5 10 #'sin)
 #(0.8414709848078965 0.9974949866040544 0.9092974268256817 0.5984721441039565
-  0.1411200080598672 -0.35078322768961984 -0.7568024953079282 -0.977530117665097 
+  0.1411200080598672 -0.35078322768961984 -0.7568024953079282 -0.977530117665097
   -0.9589242746631385 -0.7055403255703919 -0.27941549819892586 0.21511998808781552
   0.6569865987187891 0.9379999767747389 0.9893582466233818 0.7984871126234903
   0.4121184852417566 -0.0751511204618093 -0.5440211108893698)
@@ -45,11 +45,11 @@ Map currently has two integration routines, a dumb, Riemann integration method, 
 
 ```lisp
 ;; Returns a vector of differential values to be multiplied by the step size
-(defun damped-driven-pendulum (ti yi) 
+(defun damped-driven-pendulum (ti yi)
 	    (declare (type double-float ti) (type (array double-float 2)))
 
-	    (vector (+ (* 1.081d0 (cos (* 2 pi ti))) 
-	    	       (* (/ -3d0 4d0) pi (sin (elt yi 1))) 
+	    (vector (+ (* 1.081d0 (cos (* 2 pi ti)))
+	    	       (* (/ -3d0 4d0) pi (sin (elt yi 1)))
 		       (* -1d0 3d0 pi (elt yi 0)))
 
 		    (elt yi 0)))
@@ -57,16 +57,13 @@ Map currently has two integration routines, a dumb, Riemann integration method, 
 ;; Integrate and hide output so slime doesn't spend minutes just printing the result we
 ;; got in seconds
 
-(map::mute (multiple-value-setq (ts ys) 
+(map::mute (multiple-value-setq (ts ys)
 	     (map:rkf45 #'damped-driven-pendulum
 		        #r(0d0 1d-7 4d1)
 			#(0d0 1d0) 1d-10)))
 
-;; Pull out the first row of the result vector for plotting
-   ;; There should be a better way to do this eventually, using slices
-(map::mute (setq y0 (coerce (loop for i from 0 upto (1- (array-dimension ys 0))
-			    collect (aref ys i 0)) 'vector)))
-
 ;; Plot (subject to heavy change)
-(map:plot ts y1)
+;; the (mref) pulls out all of the values of the first axis (using t)
+;; that are at 0 of the second index
+(map:plot (list ts (map:mref ys t 0)))
 ```
